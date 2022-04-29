@@ -1,0 +1,180 @@
+npoints=5000;
+dt = 0.01; % time step in second.
+G=6.67e-11;
+M_a=1e24; % 1.2
+M_e=1e24; % 1
+M_j=1e24; % 2
+
+x_e_initial=34000; % Initial position
+y_e_initial=0;
+z_e_initial=40;
+v_e_x_initial=0; % Initial velocity
+v_e_y_initial=-50000;
+v_e_z_initial=0;
+
+x_j_initial=-42000; % Initial position, assume at opposition initially
+y_j_initial=0;
+z_j_initial=400;
+v_j_x_initial=0;
+v_j_y_initial=35000;
+v_j_z_initial=0;
+% Create arrays to store position and velocity
+x_a_initial=15000;
+y_a_initial=0;
+z_a_initial=0;
+v_a_x_initial=0;
+v_a_y_initial=15000;
+v_a_z_initial=0;
+
+x_e=zeros(npoints,1);
+y_e=zeros(npoints,1);
+z_e=zeros(npoints,1);
+v_e_x=zeros(npoints,1);
+v_e_y=zeros(npoints,1);
+v_e_z=zeros(npoints,1);
+% Create arrays to store position and velocity
+x_j=zeros(npoints,1);
+y_j=zeros(npoints,1);
+z_j=zeros(npoints,1);
+v_j_x=zeros(npoints,1);
+v_j_y=zeros(npoints,1);
+v_j_z=zeros(npoints,1);
+
+x_a=zeros(npoints,1);
+y_a=zeros(npoints,1);
+z_a=zeros(npoints,1);
+v_a_x=zeros(npoints,1);
+v_a_y=zeros(npoints,1);
+v_a_z=zeros(npoints,1);
+
+r_e=zeros(npoints,1);
+r_j=zeros(npoints,1);
+r_a=zeros(npoints,1);
+r_e_j=zeros(npoints,1);
+r_a_j=zeros(npoints,1);
+r_e_a=zeros(npoints,1);
+
+u=zeros(npoints,1);
+k=zeros(npoints,1);
+E=zeros(npoints,1);
+t=zeros(npoints,1);
+ % Initialise positions and velocities
+x_e(1)=x_e_initial;
+y_e(1)=y_e_initial;
+z_e(1)=z_e_initial;
+v_e_x(1)=v_e_x_initial;
+v_e_y(1)=v_e_y_initial;
+v_e_z(1)=v_e_z_initial;
+
+x_j(1)=x_j_initial;
+y_j(1)=y_j_initial;
+z_j(1)=z_j_initial;
+v_j_x(1)=v_j_x_initial;
+v_j_y(1)=v_j_y_initial;
+v_j_z(1)=v_j_z_initial;
+
+x_a(1)=x_a_initial;
+y_a(1)=y_a_initial;
+z_a(1)=z_a_initial;
+v_a_x(1)=v_a_x_initial;
+v_a_y(1)=v_a_y_initial;
+v_a_z(1)=v_a_z_initial;
+t(1)=0;
+u(1)=(G*M_j*M_e/(sqrt((x_e(1)-x_j(1))^2 +(y_e(1)-y_j(1))^2+(z_e(1)-z_j(1))^2))+G*M_j*M_a/(sqrt((x_a(1)-x_j(1))^2 +(y_a(1)-y_j(1))^2+(z_a(1)-z_j(1))^2))+G*M_a*M_e/(sqrt((x_e(1)-x_a(1))^2 +(y_e(1)-y_a(1))^2+(z_e(1)-z_a(1))^2)))/1000;
+k(1)=(M_a*(v_a_x_initial^2+v_a_y_initial^2+v_a_z_initial^2)/2+M_j*(v_j_x_initial^2+v_j_y_initial^2+v_j_z_initial^2)/2+M_e*(v_e_x_initial^2+v_e_y_initial^2+v_e_z_initial^2)/2)/1000;
+E(1)=k(1)-u(1);
+%figure(1);
+%plot3(0,0,0,'-');
+%view([40,40]);
+%xlabel('x(AU)');
+%ylabel('y(AU)');
+%zlabel('z(AU)');
+%title('3 body simulation');
+%hold on;
+%rotate3d on;
+%figure(2);
+%plot(0,0,'-');
+%xlabel('time(s)');
+%ylabel('potential energy(kJ)');
+%title('potential energy of the same weights condition');
+%hold on;
+
+for i = 1:npoints-1; % loop over the timesteps
+ % Calculate distances between stars
+ r_e(i)=sqrt(x_e(i)^2+y_e(i)^2+z_e(i)^2);
+ r_j(i)=sqrt(x_j(i)^2+y_j(i)^2+z_j(i)^2);
+ r_a(i)=sqrt(x_a(i)^2+y_a(i)^2+z_a(i)^2);
+ r_e_j(i)=sqrt((x_e(i)-x_j(i))^2 +(y_e(i)-y_j(i))^2+(z_e(i)-z_j(i))^2);
+ r_e_a(i)=sqrt((x_e(i)-x_a(i))^2 +(y_e(i)-y_a(i))^2+(z_e(i)-z_a(i))^2);
+ r_a_j(i)=sqrt((x_a(i)-x_j(i))^2 +(y_a(i)-y_j(i))^2+(z_a(i)-z_j(i))^2);
+ k(i)=(M_a*(v_a_x(i)^2+v_a_y(i)^2+v_a_z(i)^2)/2+M_j*(v_j_x(i)^2+v_j_y(i)^2+v_j_z(i)^2)/2+M_e*(v_e_x(i)^2+v_e_y(i)^2+v_e_z(i)^2)/2)/1000;
+ u(i)=(G*M_j*M_e/r_e_j(i)+G*M_j*M_a/r_a_j(i)+G*M_a*M_e/r_e_a(i))/1000;
+ E(i)=k(i)-u(i);
+ % Compute new velocity
+ v_e_x(i+1)=v_e_x(i)-G*M_a*(x_e(i)-x_a(i))*dt/(r_e_a(i)^3)-G*M_j*(x_e(i)-x_j(i))*dt/(r_e_j(i)^3);
+ v_e_y(i+1)=v_e_y(i)-G*M_a*(y_e(i)-y_a(i))*dt/(r_e_a(i)^3)-G*M_j*(y_e(i)-y_j(i))*dt/(r_e_j(i)^3);
+ v_e_z(i+1)=v_e_z(i)-G*M_a*(z_e(i)-z_a(i))*dt/(r_e_a(i)^3)-G*M_j*(z_e(i)-z_j(i))*dt/(r_e_j(i)^3);
+
+ v_j_x(i+1)=v_j_x(i)-G*M_a*(x_j(i)-x_a(i))*dt/(r_a_j(i)^3)-G*M_e*(x_j(i)-x_e(i))*dt/(r_e_j(i)^3);
+ v_j_y(i+1)=v_j_y(i)-G*M_a*(y_j(i)-y_a(i))*dt/(r_a_j(i)^3)-G*M_e*(y_j(i)-y_e(i))*dt/(r_e_j(i)^3);
+ v_j_z(i+1)=v_j_z(i)-G*M_a*(z_j(i)-z_a(i))*dt/(r_a_j(i)^3)-G*M_e*(z_j(i)-z_e(i))*dt/(r_e_j(i)^3);
+
+ v_a_x(i+1)=v_a_x(i)-G*M_j*(x_a(i)-x_j(i))*dt/(r_a_j(i)^3)-G*M_e*(x_a(i)-x_e(i))*dt/(r_e_a(i)^3);
+ v_a_y(i+1)=v_a_y(i)-G*M_j*(y_a(i)-y_j(i))*dt/(r_a_j(i)^3)-G*M_e*(y_a(i)-y_e(i))*dt/(r_e_a(i)^3);
+ v_a_z(i+1)=v_a_z(i)-G*M_j*(z_a(i)-z_j(i))*dt/(r_a_j(i)^3)-G*M_e*(z_a(i)-z_e(i))*dt/(r_e_a(i)^3);
+
+ % Use Euler Cromer technique to calculate the new positions
+
+ %figure(1);
+ %p1=plot3(x_e(i),y_e(i),z_e(i) ,'.r', x_j(i),y_j(i),z_j(i), '.g',x_a(i),y_a(i),z_a(i),'.b');
+ %drawnow limitrate;
+ %figure(2);
+ %plot(t(i),u(i),'.r'); %t(i),u(i),'.k',t(i),k(i),'.b',
+ %drawnow limitrate;
+ x_e(i+1)=x_e(i)+v_e_x(i+1)*dt;
+ y_e(i+1)=y_e(i)+v_e_y(i+1)*dt;
+ z_e(i+1)=z_e(i)+v_e_z(i+1)*dt;
+ x_j(i+1)=x_j(i)+v_j_x(i+1)*dt;
+ y_j(i+1)=y_j(i)+v_j_y(i+1)*dt;
+ z_j(i+1)=z_j(i)+v_j_z(i+1)*dt;
+ x_a(i+1)=x_a(i)+v_a_x(i+1)*dt;
+ y_a(i+1)=y_a(i)+v_a_y(i+1)*dt;
+ z_a(i+1)=z_a(i)+v_a_z(i+1)*dt;
+ t(i+1)=t(i)+dt;
+ k(i+1)=(M_a*(v_a_x(i+1)^2+v_a_y(i+1)^2+v_a_z(i+1)^2)/2+M_j*(v_j_x(i+1)^2+v_j_y(i+1)^2+v_j_z(i+1)^2)/2+M_e*(v_e_x(i+1)^2+v_e_y(i+1)^2+v_e_z(i+1)^2)/2)/1000;
+ u(i+1)=(G*M_j*M_e/(sqrt((x_e(i+1)-x_j(i+1))^2 +(y_e(i+1)-y_j(i+1))^2+(z_e(i+1)-z_j(i+1))^2))+G*M_j*M_a/(sqrt((x_a(i+1)-x_j(i+1))^2 +(y_a(i+1)-y_j(i+1))^2+(z_a(i+1)-z_j(i+1))^2))+G*M_a*M_e/(sqrt((x_e(i+1)-x_a(i+1))^2 +(y_e(i+1)-y_a(i+1))^2+(z_e(i+1)-z_a(i+1))^2)))/1000;
+ E(i+1)=k(i+1)-u(i+1);
+end;
+%plot out
+N_y=length(u);
+N_z=length(E);
+y=u;
+z=E;
+t_y=(0:1:N_y-1)*dt;
+t_z=(0:1:N_z-1)*dt;
+
+figure
+plot(t_z,100*(z-z(1))/z(1),'k')
+hold on
+xlabel('time(s)')
+ylabel('error(%)')
+title('the energy error produced by iterative method')
+%[zmax,c]=max(abs(100*(z-z(1))/z(1)));
+[zmax,c]=max(100*(z-z(1))/z(1));
+plot(t_z(c),100*(z(c)-z(1))/z(1),'ro');
+[umin,d]=min(100*(z-z(1))/z(1));
+plot(t_z(d),100*(z(d)-z(1))/z(1),'bo');
+axis([0,npoints*dt,1.1*(100*(z(d)-z(1))/z(1)),(100*(z(c)-z(1))/z(1))*1.1]);
+
+figure
+h=plot3(x_e(npoints),y_e(npoints),z_e(npoints) ,'.r', x_j(npoints),y_j(npoints),z_j(npoints), '.g',x_a(npoints),y_a(npoints),z_a(npoints),'.b');
+set(h, 'MarkerSize', 10);
+view([40,40]);
+hold on
+H=plot3(x_a,y_a,z_a,'b',x_e,y_e,z_e,'r',x_j,y_j,z_j,'g');
+set(H, 'LineWidth', 1);
+legend('nested star 1','third star','nested star 2');
+xlabel('x(AU)');
+ylabel('y(AU)');
+zlabel('z(AU)');
+title('3 body initial state');
